@@ -1,0 +1,17 @@
+services:
+  redis:
+    image: redis:7-alpine
+    command: redis-server --notify-keyspace-events KEx
+    ports:
+      - "6379:6379"
+
+  watchdog:
+    build: .
+    image: ghcr.io/fxiii/watchdog:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - MAX_EXPIRE_SECONDS=2592000
+    depends_on:
+      - redis

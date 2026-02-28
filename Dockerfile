@@ -1,19 +1,11 @@
-FROM python:3-alpine
-MAINTAINER FxIII <fx@myself.example.com>
+FROM python:3.12-slim
 
-COPY app /app
-WORKDIR /
+WORKDIR /app
 
-# Add Tini
-RUN apk --no-cache add  tini build-base \
-    && pip install -r app/requirement.txt \
-    && apk del build-base \
-    && rm /root/.cache/* -rf \
-    && rm -rf /var/acke/apk/*
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# RUN pip install -r app/requirement.txt
+COPY app.py .
+COPY static/ static/
 
-EXPOSE 8080
-
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD ["/app/startup.sh"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
